@@ -7,7 +7,7 @@ extern crate image;
 
 mod glwinhelp;
 
-use glwinhelp::{imgwin, VirtualKeyCode};
+use glwinhelp::{imgwin};
 use std::time::Duration;
 
 use freenectrs::freenect;
@@ -38,9 +38,9 @@ pub fn main() {
     }
     let device = ctx.open_device(0).unwrap();
     device.set_depth_mode(freenect::FreenectResolution::Medium,
-                                freenect::FreenectDepthFormat::MM).unwrap();
+                          freenect::FreenectDepthFormat::MM).unwrap();
     device.set_video_mode(freenect::FreenectResolution::Medium,
-                                freenect::FreenectVideoFormat::Rgb).unwrap();
+                          freenect::FreenectVideoFormat::Rgb).unwrap();
     
     let mut dwin = imgwin::ImgWindow::new("Live Depth");
     let mut vwin = imgwin::ImgWindow::new("Live RGB");
@@ -50,10 +50,6 @@ pub fn main() {
     let mut dimg = image::RgbaImage::new(640, 480);
     let mut vimg = image::RgbaImage::new(640, 480);
     ctx.spawn_process_thread().unwrap();
-    let mut inphandler = InputHandler {
-        device: &device,
-        is_closed: false,
-    };
     loop {
         let _ = imgwin::FixWaitTimer::new(Duration::from_millis(1000 / 25));
         if let Ok((data, _ /* timestamp */)) = dstream.receiver.try_recv() {
@@ -70,37 +66,5 @@ pub fn main() {
         vwin.set_img(vimg.clone());
         dwin.redraw();
         vwin.redraw();
-        dwin.check_for_event(&mut inphandler);
-        vwin.check_for_event(&mut inphandler);
-        if inphandler.is_closed {
-            break;
-        }
-    }
-    ctx.stop_process_thread().unwrap();
-}
-
-struct InputHandler<'a, 'b: 'a> {
-    device: &'a freenect::FreenectDevice<'a, 'b>,
-    is_closed: bool,
-}
-
-impl<'a, 'b> imgwin::EventHandler for InputHandler<'a, 'b> {
-    fn close_event(&mut self) {
-        self.is_closed = true;
-    }
-    fn key_event(&mut self, inp: Option<VirtualKeyCode>) {
-        if let Some(code) = inp {
-            match code {
-                VirtualKeyCode::Up => {
-                    self.device.set_tilt_degree(self.device.get_tilt_degree().unwrap() + 10.0).unwrap()
-                }
-                VirtualKeyCode::Down => {
-                    self.device.set_tilt_degree(self.device.get_tilt_degree().unwrap() - 10.0).unwrap()
-                }
-                
-                VirtualKeyCode::Q => self.is_closed = true,
-                _ => (),
-            }
-        }
     }
 }

@@ -3,8 +3,7 @@ use glium;
 use glium::{DisplayBuild, Surface};
 use glium::backend::glutin_backend::GlutinFacade;
 use glium::index::PrimitiveType;
-use glium::glutin::{Event, VirtualKeyCode};
-use glium::glutin;
+use glium::glutin::{VirtualKeyCode};
 
 #[derive(Copy,Clone)]
 struct Vertex {
@@ -81,9 +80,9 @@ impl ImgWindow {
         ImgWindow {
             texture: None,
             facade: display,
-            vertex_buffer: vertex_buffer,
-            index_buffer: index_buffer,
-            program: program,
+            vertex_buffer,
+            index_buffer,
+            program,
         }
     }
     pub fn set_img(&mut self, img: image::RgbaImage) {
@@ -117,22 +116,6 @@ impl ImgWindow {
         target.finish().unwrap();
         // self.facade.swap_buffers().unwrap();
     }
-    
-    
-    pub fn check_for_event<T: EventHandler>(&self, handler: &mut T) {
-        for event in self.facade.poll_events() {
-            match event {
-                Event::Closed => {
-                    handler.close_event();
-                    return;
-                }
-                Event::KeyboardInput(glutin::ElementState::Pressed, _, code) => {
-                    handler.key_event(code)
-                }
-                _ => (),
-            }
-        }
-    }
 }
 
 use std::time::{Instant, Duration};
@@ -150,7 +133,7 @@ impl FixWaitTimer {
     pub fn new(duration: Duration) -> FixWaitTimer {
         FixWaitTimer {
             begin: Instant::now(),
-            duration: duration,
+            duration,
         }
     }
 }
