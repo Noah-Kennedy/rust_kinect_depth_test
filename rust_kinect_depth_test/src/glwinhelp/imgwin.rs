@@ -3,9 +3,9 @@ use glium;
 use glium::{DisplayBuild, Surface};
 use glium::backend::glutin_backend::GlutinFacade;
 use glium::index::PrimitiveType;
-use glium::glutin::{VirtualKeyCode};
+use glium::glutin::VirtualKeyCode;
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 struct Vertex {
     position: [f32; 2],
     tex_coords: [f32; 2],
@@ -89,7 +89,6 @@ impl ImgWindow {
         let dim = img.dimensions();
         let text = glium::texture::RawImage2d::from_raw_rgba_reversed(img.into_raw(), dim);
         self.texture = glium::texture::CompressedSrgbTexture2d::new(&self.facade, text).ok();
-        
     }
     
     /// Redraws using opengl
