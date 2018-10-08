@@ -23,6 +23,8 @@ fn spectrum_curve(input: f32) -> f32 {
     return f32::min(f32::max(2.0 - input.abs(), 0.0), 1.0) * 255.0;
 }
 
+
+
 #[inline]
 fn convert_depth_to_rgb(distance: f32) -> (u8, u8, u8) {
     if distance < 0.0 {
@@ -62,10 +64,11 @@ fn depth_to_img(data: &[u16]) -> image::RgbaImage {
     })
 }
 
+
 fn push_image_to_window(dstream: &freenect::FreenectDepthStream,
                         mut dimg: image::RgbaImage,
                         dwin: &mut imgwin::ImgWindow) -> image::RgbaImage {
-    let _ = imgwin::FixWaitTimer::new(Duration::from_millis(1000 / 25));
+    imgwin::FixWaitTimer::new(Duration::from_millis(1000 / 25));
     if let Ok((data, _ /* timestamp */)) = dstream.receiver.try_recv() {
         dimg = depth_to_img(&*data);
     }
